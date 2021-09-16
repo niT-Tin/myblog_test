@@ -21,7 +21,7 @@ const (
 
 type IBlog interface {
 	Insert(blog *models.Blog, m *models.Content) (int64, error)
-	Update(blog *models.Blog) (int64, error)
+	Update(blog *models.Blog, m *models.Content) (int64, error)
 	SelectByBlogId(int64) (*models.Blog, *models.Content, error)
 	SelectAll() ([]models.Blog, []models.Content, error)
 	SelectByPosterId(int64, int64) (*models.Blog, *models.Content, error)
@@ -32,12 +32,20 @@ type IBlog interface {
 }
 
 type Merge struct {
-	B  *models.Blog
-	BS []models.Blog
-	//C *models.Content
-	//CS []models.Content
-	RowsAffected int64
-	Error        error
+	B            *models.Blog     `json:"blog,omitempty"`
+	BS           []models.Blog    `json:"blog_slice,omitempty"`
+	C            *models.Content  `json:"content,omitempty"`
+	CS           []models.Content `json:"content_slice,omitempty"`
+	IS           []models.Item    `json:"item_slice,omitempty"`
+	U            models.User      `json:"user,omitempty"`
+	US           []models.User    `json:"user_slice,omitempty"`
+	IsSuccess    bool             `json:"is_success,omitempty"`
+	Token        string           `json:"token,omitempty"`
+	ContentID    int64            `json:"content_id,omitempty"`
+	PosterID     int64            `json:"poster_id"`
+	BlogID       int64            `json:"blog_id"`
+	RowsAffected int64            `json:"rows_affected"`
+	Error        error            `json:"error"`
 }
 
 type Blog struct {
@@ -105,8 +113,9 @@ func (b *Blog) Insert(blog *models.Blog, c *models.Content) (int64, error) {
 }
 
 // Update 更新博客数据
-func (b *Blog) Update(blog *models.Blog) (int64, error) {
+func (b *Blog) Update(blog *models.Blog, m *models.Content) (int64, error) {
 	blog.LastUpdatedAt = time.Now()
+	_ = NoRepeatBlog(b.db.Model(m).Updates(m), "更新博客内容错误", ReturnTypeINT64, &Merge{})
 	repeatBlog := NoRepeatBlog(b.db.Model(blog).Updates(blog), "更新博客错误", ReturnTypeINT64, &Merge{})
 	return repeatBlog.RowsAffected, repeatBlog.Error
 }

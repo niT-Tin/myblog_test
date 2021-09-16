@@ -12,9 +12,9 @@ type IUser interface {
 	SelectAll() ([]models.User, error)
 	SelectByUserName(user string) (*models.User, error)
 	SelectByNickName(user string) (*models.User, error)
-	//DeleteAll()
-
 	Delete(user *models.User) bool
+	IsExist(user *models.User) bool
+	IsMatch(user *models.User) bool
 }
 
 type User struct {
@@ -82,4 +82,30 @@ func (u *User) Delete(user *models.User) bool {
 		return false
 	}
 	return true
+}
+
+// IsExist 判断用户是否存在
+func (u *User) IsExist(user *models.User) bool {
+	var tu models.User
+	_, err2 := NoRepeat1(u.db.Where("user_name = ?", user.UserName).First(&tu), "用户存在判断错误")
+	if err2 != nil {
+		return false
+	}
+	if tu.Password != "" && tu.ID != 0 {
+		return true
+	}
+	return false
+}
+
+// IsMatch 判断帐号密码是否匹配
+func (u *User) IsMatch(user *models.User) bool {
+	var tu models.User
+	_, err2 := NoRepeat1(u.db.Where("user_name = ? and password = ?", user.UserName, user.Password).First(&tu), "用户匹配过程错误")
+	if err2 != nil {
+		return false
+	}
+	if tu.UserName == user.UserName && tu.Password == user.Password {
+		return true
+	}
+	return false
 }

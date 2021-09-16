@@ -48,21 +48,21 @@ func (c *Content) Update(content *models.Content) (int64, error) {
 // SelectByContentId 根据内容id查询内容
 func (c *Content) SelectByContentId(contentId int64) (*models.Content, error) {
 	var content models.Content
-	_, err2 := NoRepeat1(c.db.Where("contentId = ? ", contentId).First(&content), "查询博客内容错误")
-	return &content, err2
+	_, err3 := NoRepeat1(c.db.Where("contentId = ? ", contentId).First(&content), "查询博客内容错误")
+	return &content, err3
 }
 
 // SelectAll 查询所有内容数据
 func (c *Content) SelectAll() ([]models.Content, error) {
 	var cs []models.Content
-	_, err2 := NoRepeat1(c.db.Find(&cs), "查询所有内容错误")
-	return cs, err2
+	_, err3 := NoRepeat1(c.db.Find(&cs), "查询所有内容错误")
+	return cs, err3
 }
 
 // DeleteByContentId 根据内容id删除数据
 func (c *Content) DeleteByContentId(contentId int64) bool {
-	_, err2 := NoRepeat1(c.db.Where("contentId = ?", contentId).Delete(models.Content{}), "删除博客内容错误")
-	if err2 != nil {
+	_, err3 := NoRepeat1(c.db.Where("contentId = ?", contentId).Delete(models.Content{}), "删除博客内容错误")
+	if err3 != nil {
 		return false
 	}
 	return true
@@ -70,8 +70,8 @@ func (c *Content) DeleteByContentId(contentId int64) bool {
 
 // DeleteAll 删除所有内容数据
 func (c *Content) DeleteAll() bool {
-	_, err2 := NoRepeat1(c.db.Delete(&models.Content{}), "删除所有内容错误")
-	if err2 != nil {
+	_, err3 := NoRepeat1(c.db.Delete(&models.Content{}), "删除所有内容错误")
+	if err3 != nil {
 		return false
 	}
 	return true
